@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>崇德学校一体化办公平台 · 移动端原型设计</title>
+<style>
+  :root{
+    --brand:#3D5AFE;
+    --brand-2:#6A7BFF;
+    --brand-3:#8E8BFF;
+    --teach:#3B6DFF;
+    --logis:#FF9F43;
+    --admin:#8B5CF6;
+    --ink:#1A2340;
+    --muted:#8A93A6;
+    --bg:#F4F6FB;
+    --card:#ffffff;
+    --line:#ECF0F7;
+    --shadow:0 8px 24px rgba(43,60,120,.10);
+    --shadow-sm:0 3px 10px rgba(43,60,120,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  html,body{height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%, #2B3A6B 0%, transparent 55%),
+               radial-gradient(1000px 700px at 100% 110%, #1E2C55 0%, transparent 55%),
+               linear-gradient(160deg,#0E1530 0%,#16214A 55%,#101a3d 100%);
+    color:var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    min-height:100vh;padding:28px 20px;
+  }
+  .stage{display:flex;align-items:flex-start;gap:44px;justify-content:center;flex-wrap:wrap;}
+
+  /* ============ 手机外框 ============ */
+  .device{position:relative;}
+  .phone{
+    position:relative;width:376px;height:812px;border-radius:50px;
+    background:#0b0e18;padding:10px;
+    box-shadow:0 40px 80px -20px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.06);
+  }
+  .phone-inner{
+    position:relative;width:100%;height:100%;border-radius:42px;background:var(--bg);overflow:hidden;
+  }
+  .notch{
+    position:absolute;top:0;left:50%;transform:translateX(-50%);width:150px;height:28px;
+    background:#0b0e18;border-radius:0 0 18px 18px;z-index:60;
+  }
+  .notch::after{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);
+    width:54px;height:5px;border-radius:3px;background:#1c2030;}
+  .homebar{
+    position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:130px;height:4.5px;
+    border-radius:3px;background:rgba(0,0,0,.32);z-index:60;
+  }
+
+  /* ============ 屏幕层 ============ */
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);
+    transition:transform .48s cubic-bezier(.32,.72,.28,1);will-change:transform;}
+  .screen.home{transform:translateX(0);z-index:2;}
+  .screen.sub{transform:translateX(100%);z-index:3;background:#fff;}
+  .phone.show-sub .screen.home{transform:translateX(-28%);}
+  .phone.show-sub .screen.sub{transform:translateX(0);}
+
+  /* 状态栏 */
+  .statusbar{
+    height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;
+    padding:0 26px;font-size:14px;font-weight:600;color:#fff;
+    background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 55%,var(--brand-3) 120%);
+  }
+  .sb-right{display:flex;align-items:center;gap:6px;}
+  .sb-right svg{display:block;}
+  .statusbar.dark{color:var(--ink);background:transparent;}
+
+  /* 首页头部 */
+  .home-header{
+    flex:none;padding:14px 20px 4px;display:flex;align-items:center;justify-content:space-between;
+    background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 55%,var(--brand-3) 120%);
+    color:#fff;
+  }
+  .hello{font-size:20px;font-weight:700;letter-spacing:.3px;}
+  .hello .wave{display:inline-block;animation:wave 2.2s ease infinite;transform-origin:70% 70%;}
+  @keyframes wave{0%,60%,100%{transform:rotate(0)}10%{transform:rotate(14deg)}20%{transform:rotate(-8deg)}30%{transform:rotate(14deg)}40%{transform:rotate(-4deg)}50%{transform:rotate(10deg)}}
+  .sub{font-size:12px;opacity:.85;margin-top:3px;}
+  .avatar{
+    width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.35);
+    display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;backdrop-filter:blur(4px);
+  }
+  .searchbar{
+    flex:none;margin:14px 20px 2px;height:42px;border-radius:14px;background:#fff;box-shadow:var(--shadow-sm);
+    display:flex;align-items:center;gap:9px;padding:0 14px;color:var(--muted);font-size:13px;cursor:pointer;
+    border:1px solid var(--line);
+  }
+  .scroll{flex:1;overflow-y:auto;padding:0 20px 16px;scrollbar-width:none;}
+  .scroll::-webkit-scrollbar{display:none;}
+
+  /* 横幅 */
+  .banner{
+    margin-top:14px;border-radius:18px;padding:15px 16px;color:#fff;position:relative;overflow:hidden;
+    background:linear-gradient(120deg,#2b3f9e 0%,#3D5AFE 100%);box-shadow:0 12px 26px -8px rgba(61,90,254,.55);
+  }
+  .banner::after{content:"";position:absolute;right:-26px;top:-30px;width:110px;height:110px;border-radius:50%;
+    background:rgba(255,255,255,.12);}
+  .banner::before{content:"";position:absolute;right:18px;bottom:-34px;width:80px;height:80px;border-radius:50%;
+    background:rgba(255,255,255,.10);}
+  .ban-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 9px;border-radius:20px;
+    background:rgba(255,255,255,.2);margin-bottom:7px;}
+  .ban-title{font-size:16px;font-weight:700;position:relative;z-index:1;}
+  .ban-date{font-size:11.5px;opacity:.85;margin-top:4px;position:relative;z-index:1;}
+
+  /* 快捷功能 */
+  .section-label{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 10px;}
+  .section-label h3{font-size:15px;font-weight:700;color:var(--ink);}
+  .section-label span{font-size:11px;color:var(--muted);}
+  .quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .quick-item{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;}
+  .quick-ico{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+    color:#fff;box-shadow:var(--shadow-sm);transition:transform .18s ease;}
+  .quick-item:active .quick-ico{transform:scale(.9);}
+  .quick-item span{font-size:11.5px;color:#3c4660;font-weight:500;}
+
+  /* 功能模块卡片 */
+  .modules{display:flex;flex-direction:column;gap:12px;}
+  .module-card{
+    display:flex;align-items:center;gap:14px;padding:16px;border-radius:18px;background:var(--card);
+    box-shadow:var(--shadow-sm);cursor:pointer;border:1px solid var(--line);position:relative;overflow:hidden;
+    transition:transform .18s ease, box-shadow .2s ease;
+  }
+  .module-card:active{transform:scale(.975);box-shadow:var(--shadow);}
+  .module-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--mcolor,#3B6DFF);border-radius:0 3px 3px 0;}
+  .mc-ico{width:50px;height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;color:#fff;flex:none;}
+  .mc-body{flex:1;min-width:0;}
+  .mc-name{font-size:15.5px;font-weight:700;color:var(--ink);}
+  .mc-desc{font-size:11.5px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mc-count{margin-left:4px;font-size:10px;padding:2px 7px;border-radius:20px;background:#EEF2FF;color:#3B6DFF;font-weight:600;}
+  .mc-arrow{color:#c4cad6;flex:none;}
+
+  /* 通知 */
+  .notice{margin-top:16px;background:#fff;border-radius:16px;padding:13px 14px;box-shadow:var(--shadow-sm);border:1px solid var(--line);display:flex;gap:11px;align-items:center;}
+  .notice .dot{width:36px;height:36px;border-radius:11px;background:#FFF3E6;color:#FF9F43;display:flex;align-items:center;justify-content:center;flex:none;}
+  .notice .n-t{font-size:13px;font-weight:600;color:var(--ink);}
+  .notice .n-s{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  /* 底部导航 */
+  .tabbar{flex:none;height:64px;background:#fff;border-top:1px solid var(--line);display:flex;align-items:center;padding-bottom:6px;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:#9aa3b5;cursor:pointer;font-size:10.5px;transition:color .2s;}
+  .tab.active{color:var(--brand);}
+  .tab svg{transition:transform .2s;}
+  .tab.active svg{transform:translateY(-1px);}
+
+  /* ============ 二级页 ============ */
+  .sub-head{
+    flex:none;padding:10px 16px 14px;color:#fff;display:flex;align-items:center;gap:10px;
+    background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 55%,var(--brand-3) 120%);
+  }
+  .sub-head .back{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;}
+  .sub-head .t{flex:1;}
+  .sub-head .t h2{font-size:18px;font-weight:700;}
+  .sub-head .t p{font-size:11.5px;opacity:.85;margin-top:2px;}
+  .role-group{padding:16px 16px 4px;}
+  .role-head{display:flex;align-items:center;gap:8px;margin-bottom:11px;}
+  .role-chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:8px;}
+  .role-chip.staff{background:#EEF2FF;color:#3B6DFF;}
+  .role-chip.admin{background:#F3EEFF;color:#8B5CF6;}
+  .role-note{font-size:10.5px;color:#E9A23B;background:#FFF8EC;border:1px solid #FFE7C2;border-radius:8px;padding:6px 10px;margin:-2px 0 12px;line-height:1.5;}
+  .fn-list{display:flex;flex-direction:column;gap:10px;}
+  .fn-item{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px 13px;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .15s ease;}
+  .fn-item:active{transform:scale(.975);}
+  .fn-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;flex:none;}
+  .fn-body{flex:1;min-width:0;}
+  .fn-name{font-size:14px;font-weight:600;color:var(--ink);}
+  .fn-desc{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fn-arrow{color:#c4cad6;flex:none;}
+
+  /* 底部抽屉 */
+  .sheet-mask{position:absolute;inset:0;background:rgba(10,15,35,.45);opacity:0;pointer-events:none;transition:opacity .3s;z-index:80;}
+  .sheet-mask.show{opacity:1;pointer-events:auto;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:26px 26px 0 0;padding:14px 20px 26px;
+    transform:translateY(105%);transition:transform .38s cubic-bezier(.32,.72,.28,1);z-index:81;box-shadow:0 -20px 50px rgba(0,0,0,.2);}
+  .sheet.show{transform:translateY(0);}
+  .sheet .grab{width:40px;height:4.5px;border-radius:3px;background:#E3E8F0;margin:0 auto 14px;}
+  .sheet .s-ico{width:52px;height:52px;border-radius:15px;color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:11px;box-shadow:var(--shadow-sm);}
+  .sheet .s-name{font-size:17px;font-weight:700;color:var(--ink);}
+  .sheet .s-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+  .sheet .s-link{display:flex;align-items:center;gap:7px;margin-top:12px;font-size:11.5px;color:#3B6DFF;background:#EEF2FF;border-radius:10px;padding:8px 12px;overflow:hidden;}
+  .sheet .s-link code{font-family:ui-monospace,SFMono-Regular,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#4a5bb0;}
+  .sheet .s-btn{margin-top:16px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 22px -8px rgba(61,90,254,.6);}
+  .sheet .s-btn:active{transform:scale(.98);}
+  .sheet .s-cancel{margin-top:9px;height:44px;border-radius:14px;background:#F2F4F9;color:#6a7385;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+
+  /* Toast */
+  .toast{position:absolute;left:50%;bottom:110px;transform:translate(-50%,20px);background:rgba(20,26,45,.92);color:#fff;
+    font-size:12.5px;padding:10px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:all .3s;z-index:90;white-space:nowrap;}
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+
+  /* ============ 设计说明面板 ============ */
+  .spec{
+    width:430px;max-height:812px;overflow-y:auto;scrollbar-width:none;color:#1b2540;
+    background:rgba(255,255,255,.97);border-radius:24px;padding:26px 26px 30px;
+    box-shadow:0 30px 70px -20px rgba(0,0,0,.5);backdrop-filter:blur(8px);
+  }
+  .spec::-webkit-scrollbar{display:none;}
+  .spec h1{font-size:19px;font-weight:800;letter-spacing:.3px;display:flex;align-items:center;gap:9px;}
+  .spec h1 .logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand-3));color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .spec .tagline{font-size:12.5px;color:#6b7488;margin:6px 0 18px;line-height:1.7;}
+  .spec section{margin-bottom:22px;}
+  .spec h4{font-size:11px;letter-spacing:1.5px;color:#8a93a6;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .spec h4::after{content:"";flex:1;height:1px;background:var(--line);}
+  .goals{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+  .goal{background:#F5F7FC;border:1px solid var(--line);border-radius:13px;padding:11px 11px;text-align:left;}
+  .goal b{font-size:12.5px;display:block;margin-bottom:3px;color:var(--ink);}
+  .goal span{font-size:10.5px;color:#7a8398;line-height:1.55;display:block;}
+  .swatches{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+  .sw{display:flex;align-items:center;gap:8px;background:#F5F7FC;border:1px solid var(--line);border-radius:11px;padding:8px 10px;}
+  .sw .c{width:26px;height:26px;border-radius:8px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);}
+  .sw .meta b{font-size:11.5px;display:block;color:var(--ink);}
+  .sw .meta span{font-size:9.5px;color:#8a93a6;font-family:ui-monospace,monospace;}
+  .tree{background:#F5F7FC;border:1px solid var(--line);border-radius:15px;padding:14px 16px;}
+  .tree .root{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px;}
+  .tree .root .t-ico{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,var(--brand),var(--brand-3));color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;}
+  .tree .branch{margin:0 0 9px 8px;padding-left:14px;border-left:1.5px dashed #d4dae8;}
+  .tree .branch:last-child{margin-bottom:0;}
+  .tree .b-label{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#2b3550;margin-bottom:4px;}
+  .tree .b-dot{width:8px;height:8px;border-radius:3px;flex:none;}
+  .tree .b-sub{font-size:10.5px;color:#8a93a6;line-height:1.6;padding-left:15px;}
+  .inter-list{list-style:none;}
+  .inter-list li{display:flex;gap:10px;font-size:12px;color:#3c4660;padding:7px 0;border-bottom:1px dashed #EEF1F7;line-height:1.55;}
+  .inter-list li:last-child{border-bottom:none;}
+  .inter-list .n{flex:none;width:20px;height:20px;border-radius:7px;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-size:10.5px;display:flex;align-items:center;justify-content:center;font-weight:700;margin-top:1px;}
+  .hl{display:flex;gap:10px;align-items:flex-start;padding:9px 0;}
+  .hl .h-ico{flex:none;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;}
+  .hl b{font-size:12.5px;color:var(--ink);display:block;}
+  .hl span{font-size:11px;color:#7a8398;line-height:1.55;display:block;margin-top:2px;}
+  .spec .foot{font-size:10.5px;color:#9aa3b5;text-align:center;margin-top:6px;line-height:1.7;}
+
+  @media (max-width:920px){
+    .stage{flex-direction:column;align-items:center;}
+    .spec{width:min(430px,92vw);}
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- ===================== 手机原型 ===================== -->
+  <div class="device">
+    <div class="phone" id="phone">
+      <div class="phone-inner">
+        <div class="notch"></div>
+
+        <!-- 首页 -->
+        <div class="screen home" id="homeScreen">
+          <div class="statusbar" style="background:linear-gradient(135deg,var(--brand),var(--brand-2) 55%,var(--brand-3) 120%);">
+            <span id="clock">9:41</span>
+            <div class="sb-right">
+              <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="1"/><rect x="4.5" y="4" width="3" height="7" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+              <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5c2.5 0 4.8 1 6.5 2.6l1.4-1.4C13.9 1.7 11 0.5 8 0.5S2.1 1.7 0.1 3.7l1.4 1.4C3.2 3.5 5.5 2.5 8 2.5z"/><path d="M8 6c1.4 0 2.7 0.6 3.7 1.5l1.4-1.4C11.7 4.7 9.9 4 8 4S4.3 4.7 2.9 6.1l1.4 1.4C5.3 6.6 6.6 6 8 6z"/><circle cx="8" cy="9.3" r="1.6"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity=".5"/></svg>
+            </div>
+          </div>
+
+          <div class="home-header">
+            <div>
+              <div class="hello">早上好，欢迎回来 <span class="wave">👋</span></div>
+              <div class="sub">蒙自市崇德学校 · 一体化办公平台</div>
+            </div>
+            <div class="avatar">崇</div>
+          </div>
+
+          <div class="searchbar" onclick="toast('搜索功能将在下一版本开放')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>搜索功能 / 表单</span>
+          </div>
+
+          <div class="scroll">
+            <div class="banner">
+              <span class="ban-tag">📌 今日</span>
+              <div class="ban-title">欢迎使用一体化办公平台</div>
+              <div class="ban-date" id="banDate">2026年8月31日</div>
+            </div>
+
+            <div class="section-label"><h3>快捷入口</h3><span>常用功能一键直达</span></div>
+            <div class="quick">
+              <div class="quick-item" onclick="openModule('teaching')">
+                <div class="quick-ico" style="background:linear-gradient(135deg,#3B6DFF,#6A8BFF)">ICON.clipboard</div>
+                <span>课堂日志</span>
+              </div>
+              <div class="quick-item" onclick="openModule('teaching')">
+                <div class="quick-ico" style="background:linear-gradient(135deg,#00B894,#3ED0A8)">ICON.swap</div>
+                <span>调课申请</span>
+              </div>
+              <div class="quick-item" onclick="openModule('logistics')">
+                <div class="quick-ico" style="background:linear-gradient(135deg,#FF9F43,#FFB36B)">ICON.tool</div>
+                <span>后勤报修</span>
+              </div>
+              <div class="quick-item" onclick="openModule('admin')">
+                <div class="quick-ico" style="background:linear-gradient(135deg,#8B5CF6,#B18CFF)">ICON.phone</div>
+                <span>通讯录</span>
+              </div>
+            </div>
+
+            <div class="section-label"><h3>功能模块</h3><span>共 3 大类 · 18 项功能</span></div>
+            <div class="modules" id="modules"></div>
+
+            <div class="notice">
+              <div class="dot"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+              <div>
+                <div class="n-t">系统通知</div>
+                <div class="n-s">管理员端功能需向管理员申请权限后使用</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tabbar">
+            <div class="tab active" onclick="setTab(this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>首页</div>
+            <div class="tab" onclick="setTab(this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>工作台</div>
+            <div class="tab" onclick="setTab(this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>消息</div>
+            <div class="tab" onclick="setTab(this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>我的</div>
+          </div>
+        </div>
+
+        <!-- 二级页 -->
+        <div class="screen sub" id="subScreen"></div>
+
+        <!-- 抽屉 / 遮罩 / toast -->
+        <div class="sheet-mask" id="mask" onclick="closeSheet()"></div>
+        <div class="sheet" id="sheet"></div>
+        <div class="toast" id="toast"></div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= 图标库（Feather 风格） ================= */
+function svg(p){return '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
+const ICON={
+  book:svg('<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>'),
+  tool:svg('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'),
+  users:svg('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+  clipboard:svg('<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>'),
+  swap:svg('<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>'),
+  search:svg('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'),
+  printer:svg('<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>'),
+  chart:svg('<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>'),
+  check:svg('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'),
+  eye:svg('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'),
+  package:svg('<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>'),
+  phone:svg('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>'),
+  edit:svg('<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'),
+  shield:svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
+  arrow:svg('<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>'),
+  back:svg('<polyline points="15 18 9 12 15 6"/>'),
+  link:svg('<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>')
+};
+
+/* ================= 业务数据（严格依据 md 文档） ================= */
+const DATA=[
+  {
+    id:'teaching', name:'教学管理', color:'#3B6DFF', grad:'linear-gradient(135deg,#3B6DFF,#6A8BFF)',
+    icon:'book', desc:'课堂日志 · 调课申请 · 印刷管理', count:10,
+    roles:[
+      {name:'任课教师', type:'staff',
+        items:[
+          {n:'课堂日志（初中部）', d:'填写每日课堂情况', i:'clipboard', c:'#3B6DFF', u:'https://f.wps.cn/g/kYEy2bJO/'},
+          {n:'教师调课申请', d:'提交调课申请表单', i:'swap', c:'#00B894', u:'https://f.wps.cn/g/1L5U5MyE/'},
+          {n:'调课申请审核情况查询', d:'查询调课申请审核进度', i:'search', c:'#6A7BFF', u:'https://www.kdocs.cn/wo/sl/v11de30g'},
+          {n:'资料印刷申请', d:'提交资料印制申请', i:'printer', c:'#FF9F43', u:'https://f.wps.cn/g/cN8Y1EFe/'},
+          {n:'印刷进度查询', d:'查询印制处理进度', i:'chart', c:'#F56565', u:'https://www.kdocs.cn/etapps/query/q/g6nKkxFm'}
+        ]},
+      {name:'管理人员', type:'admin', note:'初次使用需申请权限，请备注姓名',
+        items:[
+          {n:'调课申请审核', d:'审核教师调课申请', i:'check', c:'#3B6DFF', u:'https://www.kdocs.cn/wo/sl/v1ZnOGh'},
+          {n:'班级人数修改（班主任）', d:'维护班级学生人数', i:'users', c:'#6A7BFF', u:'https://www.kdocs.cn/l/coeb0xCvtMgB'},
+          {n:'日常查课（初中部）', d:'每日巡课记录', i:'eye', c:'#00B894', u:'https://www.kdocs.cn/l/cdqOe3fhNPV5'},
+          {n:'资料印刷审核', d:'审核印刷申请', i:'shield', c:'#FF9F43', u:'https://www.kdocs.cn/wo/sl/v12LUEIW'},
+          {n:'文印室管理员终端', d:'文印室后台管理', i:'printer', c:'#F56565', u:'https://www.kdocs.cn/wo/sl/v1wsEnq'}
+        ]}
+    ]
+  },
+  {
+    id:'logistics', name:'后勤管理', color:'#FF9F43', grad:'linear-gradient(135deg,#FF9F43,#FFB36B)',
+    icon:'tool', desc:'后勤报修 · 物品申请 · 报修管理', count:6,
+    roles:[
+      {name:'教职工', type:'staff',
+        items:[
+          {n:'后勤报修', d:'提交设备设施报修', i:'tool', c:'#FF9F43', u:'https://www.kdocs.cn/wo/sl/v12Qw43K'},
+          {n:'报修办结情况查询', d:'查询报修处理进度', i:'search', c:'#6A7BFF', u:'https://www.kdocs.cn/wo/sl/v12HrUYh'},
+          {n:'物品申请', d:'提交物品领用申请', i:'package', c:'#00B894', u:'https://f.wps.cn/g/9BRiWTVp/'},
+          {n:'物品申请审核情况查询', d:'查询物品申请进度', i:'search', c:'#F56565', u:'https://www.kdocs.cn/etapps/query/q/np7i289X'}
+        ]},
+      {name:'后勤管理员', type:'admin', note:'初次使用需申请权限，请备注姓名',
+        items:[
+          {n:'报修管理', d:'处理报修工单', i:'tool', c:'#FF9F43', u:'https://www.kdocs.cn/l/cgvZwQ0NYF8s'},
+          {n:'物品申请审核', d:'审核物品申请', i:'check', c:'#00B894', u:'https://www.kdocs.cn/l/ci1vR1gxhq8H'}
+        ]}
+    ]
+  },
+  {
+    id:'admin', name:'行政管理', color:'#8B5CF6', grad:'linear-gradient(135deg,#8B5CF6,#B18CFF)',
+    icon:'users', desc:'通讯录 · 校内信息管理', count:2,
+    roles:[
+      {name:'教职工', type:'staff',
+        items:[
+          {n:'教职工通讯录', d:'查看校内教职工联系方式', i:'phone', c:'#8B5CF6', u:'https://web.wps.cn/wo/sl/v32fwWCG?app_id=2jyl5GHXoqWXqHmUxjU9Ur'}
+        ]},
+      {name:'行政管理人员', type:'admin',
+        items:[
+          {n:'教职工校内信息管理', d:'维护教职工档案信息', i:'edit', c:'#6A7BFF', u:'https://www.kdocs.cn/l/cod7nafNk5QH'}
+        ]}
+    ]
+  }
+];
+
+/* ================= 渲染首页模块卡片 ================= */
+const modulesEl=document.getElementById('modules');
+modulesEl.innerHTML=DATA.map(m=>`
+  <div class="module-card" style="--mcolor:${m.color}" onclick="openModule('${m.id}')">
+    <div class="mc-ico" style="background:${m.grad}">${ICON[m.icon]}</div>
+    <div class="mc-body">
+      <div class="mc-name">${m.name}<span class="mc-count">${m.count} 项</span></div>
+      <div class="mc-desc">${m.desc}</div>
+    </div>
+    <div class="mc-arrow">${ICON.arrow}</div>
+  </div>`).join('');
+
+/* ================= 交互逻辑 ================= */
+const phone=document.getElementById('phone');
+const subScreen=document.getElementById('subScreen');
+const mask=document.getElementById('mask');
+const sheet=document.getElementById('sheet');
+const toastEl=document.getElementById('toast');
+let currentModule=null;
+
+function openModule(id){
+  const m=DATA.find(x=>x.id===id); if(!m) return;
+  currentModule=m;
+  subScreen.innerHTML=`
+    <div class="statusbar dark" style="background:linear-gradient(135deg,${m.color},${m.color}dd);color:#fff">
+      <span>9:41</span>
+      <div class="sb-right">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="1"/><rect x="4.5" y="4" width="3" height="7" rx="1"/><rect x="9" y="2" width="3" height="9" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5c2.5 0 4.8 1 6.5 2.6l1.4-1.4C13.9 1.7 11 0.5 8 0.5S2.1 1.7 0.1 3.7l1.4 1.4C3.2 3.5 5.5 2.5 8 2.5z"/><path d="M8 6c1.4 0 2.7 0.6 3.7 1.5l1.4-1.4C11.7 4.7 9.9 4 8 4S4.3 4.7 2.9 6.1l1.4 1.4C5.3 6.6 6.6 6 8 6z"/><circle cx="8" cy="9.3" r="1.6"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity=".5"/></svg>
+      </div>
+    </div>
+    <div class="sub-head" style="background:linear-gradient(135deg,${m.color},${m.color}cc)">
+      <div class="back" onclick="goHome()">${ICON.back}</div>
+      <div class="t">
+        <h2>${m.name}</h2>
+        <p>${m.desc}</p>
+      </div>
+    </div>
+    <div class="scroll" style="padding-bottom:20px">
+      ${m.roles.map((r,ri)=>`
+        <div class="role-group">
+          <div class="role-head">
+            <span class="role-chip ${r.type==='staff'?'staff':'admin'}">${r.type==='staff'?'👨‍🏫 教职工':'🛡️ 管理人员'}</span>
+          </div>
+          ${r.note?`<div class="role-note">⚠️ ${r.note}</div>`:''}
+          <div class="fn-list">
+            ${r.items.map(it=>`
+              <div class="fn-item" onclick="openFn('${m.id}',${ri},'${it.n}')">
+                <div class="fn-ico" style="background:${it.c}">${ICON[it.i]}</div>
+                <div class="fn-body">
+                  <div class="fn-name">${it.n}</div>
+                  <div class="fn-desc">${it.d}</div>
+                </div>
+                <div class="fn-arrow">${ICON.arrow}</div>
+              </div>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+  phone.classList.add('show-sub');
+}
+
+function goHome(){phone.classList.remove('show-sub');}
+
+function openFn(mid,ri,name){
+  const m=DATA.find(x=>x.id===mid);
+  const item=m.roles[ri].items.find(x=>x.n===name);
+  if(!item) return;
+  sheet.innerHTML=`
+    <div class="grab"></div>
+    <div class="s-ico" style="background:${item.c}">${ICON[item.i]}</div>
+    <div class="s-name">${item.n}</div>
+    <div class="s-sub">${m.name} · ${m.roles[ri].name}</div>
+    <div class="s-link">${ICON.link}<code>${item.u}</code></div>
+    <div class="s-btn" onclick="openLink('${item.u}')">打开链接 → 进入表单</div>
+    <div class="s-cancel" onclick="closeSheet()">取消</div>
+  `;
+  mask.classList.add('show');
+  sheet.classList.add('show');
+}
+function closeSheet(){mask.classList.remove('show');sheet.classList.remove('show');}
+function openLink(url){window.open(url,'_blank');}
+
+function setTab(el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const name=el.textContent.trim();
+  if(name!=='首页') toast('「'+name+'」页面开发中');
+}
+function toast(msg){
+  toastEl.textContent=msg;
+  toastEl.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>toastEl.classList.remove('show'),1600);
+}
+
+/* 时钟 & 日期 */
+function pad(n){return n<10?'0'+n:n;}
+function tick(){
+  const d=new Date();
+  document.getElementById('clock').textContent=pad(d.getHours())+':'+pad(d.getMinutes());
+}
+tick();
+const d=new Date();
+const wd=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+document.getElementById('banDate').textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 '+wd[d.getDay()];
+</script>
+</body>
+</html>
